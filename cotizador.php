@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (empty($messages['errors'])) {
                 try {
-                    output_docx_download([$currentQuote], $documentMeta);
+                    output_docx_download([$currentQuote], $documentMeta, $company);
                 } catch (RuntimeException $exception) {
                     $messages['errors'][] = $exception->getMessage();
                 }
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($messages['errors'])) {
             try {
-                output_docx_download($items, $documentMeta);
+                output_docx_download($items, $documentMeta, $company);
             } catch (RuntimeException $exception) {
                 $messages['errors'][] = $exception->getMessage();
             }

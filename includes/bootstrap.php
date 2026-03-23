@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $users = require __DIR__ . '/../config/users.php';
 $catalog = require __DIR__ . '/../config/catalog.php';
+$company = require __DIR__ . '/../config/company.php';
 
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/view.php';

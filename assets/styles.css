@@ -65,10 +65,11 @@ body {
 }
 
 .brand-logo {
-    width: 180px;
+    width: 190px;
     max-width: 100%;
     height: auto;
     display: block;
+    object-fit: contain;
 }
 
 .eyebrow {
