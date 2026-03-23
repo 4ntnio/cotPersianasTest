@@ -12,7 +12,7 @@
         <header class="site-header">
             <div class="brand-wrap">
                 <a class="brand-link" href="index.php" aria-label="Ir al inicio de ZAME Blinds">
-                    <img src="assets/img/Logo_zame_1.png" alt="ZAME Blinds" class="brand-logo">
+                    <img src="assets/img/Logo_zame_2.png" alt="ZAME Blinds" class="brand-logo">
                 </a>
                 <div>
                     <p class="eyebrow">Cotizador PHP</p>
