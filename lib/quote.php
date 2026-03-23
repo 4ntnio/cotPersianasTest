@@ -26,6 +26,26 @@ function add_quote_item(array $item)
     $_SESSION['quote_items'][] = $item;
 }
 
+function get_quote_meta()
+{
+    return $_SESSION['quote_meta'] ?? [
+        'cliente' => '',
+        'telefono' => '',
+        'vigencia' => '7 días naturales',
+        'observaciones' => '',
+    ];
+}
+
+function save_quote_meta(array $meta)
+{
+    $_SESSION['quote_meta'] = [
+        'cliente' => trim((string) ($meta['cliente'] ?? '')),
+        'telefono' => trim((string) ($meta['telefono'] ?? '')),
+        'vigencia' => trim((string) ($meta['vigencia'] ?? '7 días naturales')),
+        'observaciones' => trim((string) ($meta['observaciones'] ?? '')),
+    ];
+}
+
 function get_quote_summary(array $items)
 {
     $total = 0.00;

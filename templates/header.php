@@ -10,9 +10,14 @@
 <body>
     <div class="page-shell">
         <header class="site-header">
-            <div>
-                <p class="eyebrow">Cotizador PHP</p>
-                <h1><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></h1>
+            <div class="brand-wrap">
+                <a class="brand-link" href="index.php" aria-label="Ir al inicio de ZAME Blinds">
+                    <img src="assets/img/zame-blinds-logo.svg" alt="ZAME Blinds" class="brand-logo">
+                </a>
+                <div>
+                    <p class="eyebrow">Cotizador PHP</p>
+                    <h1><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></h1>
+                </div>
             </div>
             <?php if ($loggedInUser): ?>
                 <div class="user-panel">

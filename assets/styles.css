@@ -14,6 +14,7 @@
     --info: #0b4f6c;
     --info-bg: #e6f4ff;
     --dark: #1f2937;
+    --gold: #c6a15b;
 }
 
 * {
@@ -23,19 +24,20 @@
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
+    background: linear-gradient(180deg, #eef4ff 0%, #f7f9fc 100%);
     color: var(--text);
 }
 
 .page-shell {
-    max-width: 1120px;
+    max-width: 1180px;
     margin: 0 auto;
     padding: 32px 16px;
 }
 
 .site-header,
 .content-card,
-.panel {
+.panel,
+.subsection-card {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -51,6 +53,24 @@ body {
     align-items: center;
 }
 
+.brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.brand-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+.brand-logo {
+    width: 180px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 .eyebrow {
     margin: 0 0 6px;
     color: var(--muted);
@@ -61,6 +81,7 @@ body {
 
 h1,
 h2,
+h3,
 p {
     margin-top: 0;
 }
@@ -69,12 +90,17 @@ p {
     padding: 24px;
 }
 
-.panel {
+.panel,
+.subsection-card {
     padding: 20px;
 }
 
 .panel-spacing + .panel-spacing {
     margin-top: 24px;
+}
+
+.subsection-card {
+    background: #fbfdff;
 }
 
 .section-heading {
@@ -85,15 +111,23 @@ p {
     margin-bottom: 16px;
 }
 
+.compact-heading {
+    margin-bottom: 12px;
+}
+
 .form-grid {
     display: grid;
     gap: 16px;
 }
 
 .columns-2,
-.columns-3 {
+.columns-4 {
     display: grid;
     gap: 16px;
+}
+
+.full-span {
+    grid-column: 1 / -1;
 }
 
 @media (min-width: 720px) {
@@ -102,9 +136,9 @@ p {
     }
 }
 
-@media (min-width: 960px) {
-    .columns-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (min-width: 1040px) {
+    .columns-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
@@ -115,13 +149,20 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--line);
     border-radius: 10px;
     font-size: 16px;
     background: #fff;
+    font-family: inherit;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 94px;
 }
 
 .static-field {
@@ -160,6 +201,11 @@ select {
     color: var(--accent-dark);
 }
 
+.button-accent {
+    background: var(--gold);
+    color: #1f2937;
+}
+
 .button-dark {
     background: var(--dark);
 }
@@ -190,6 +236,10 @@ select {
     padding: 14px 16px;
     border-radius: 12px;
     margin-bottom: 18px;
+}
+
+.no-margin {
+    margin-bottom: 0;
 }
 
 .message-error {
