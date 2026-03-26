@@ -10,6 +10,7 @@ function build_document_meta(array $input)
     return [
         'client_name' => sanitize_document_text($input['cliente'] ?? ''),
         'client_phone' => sanitize_document_text($input['telefono'] ?? ''),
+        'client_address' => sanitize_document_text($input['direccion'] ?? ''),
         'validity' => sanitize_document_text($input['vigencia'] ?? '7 días naturales'),
         'observations' => sanitize_document_text($input['observaciones'] ?? ''),
     ];
@@ -130,7 +131,14 @@ function make_docx_table($rows, $options = [])
 {
     $width = isset($options['width']) ? (int) $options['width'] : 9000;
     $borders = $options['borders'] ?? true;
+    $cellMargin = $options['cell_margin'] ?? 90;
     $tableStyle = '<w:tblW w:w="' . $width . '" w:type="dxa"/>';
+    $tableStyle .= '<w:tblCellMar>'
+        . '<w:top w:w="' . (int) $cellMargin . '" w:type="dxa"/>'
+        . '<w:left w:w="' . (int) $cellMargin . '" w:type="dxa"/>'
+        . '<w:bottom w:w="' . (int) $cellMargin . '" w:type="dxa"/>'
+        . '<w:right w:w="' . (int) $cellMargin . '" w:type="dxa"/>'
+        . '</w:tblCellMar>';
 
     if ($borders) {
         $tableStyle .= '<w:tblBorders>'
@@ -151,8 +159,9 @@ function make_docx_table_cell($contentXml, $options = [])
     $width = isset($options['width']) ? (int) $options['width'] : 1800;
     $background = !empty($options['background']) ? '<w:shd w:val="clear" w:color="auto" w:fill="' . escape_docx($options['background']) . '"/>' : '';
     $vAlign = !empty($options['valign']) ? '<w:vAlign w:val="' . escape_docx($options['valign']) . '"/>' : '<w:vAlign w:val="top"/>';
+    $gridSpan = !empty($options['grid_span']) ? '<w:gridSpan w:val="' . (int) $options['grid_span'] . '"/>' : '';
 
-    return '<w:tc><w:tcPr><w:tcW w:w="' . $width . '" w:type="dxa"/>' . $background . $vAlign . '</w:tcPr>' . $contentXml . '</w:tc>';
+    return '<w:tc><w:tcPr><w:tcW w:w="' . $width . '" w:type="dxa"/>' . $gridSpan . $background . $vAlign . '</w:tcPr>' . $contentXml . '</w:tc>';
 }
 
 function make_docx_table_row($cells, $options = [])
@@ -178,14 +187,14 @@ function make_docx_inline_image($relationshipId)
     return '<w:p>'
         . '<w:r><w:drawing>'
         . '<wp:inline distT="0" distB="0" distL="0" distR="0" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">'
-        . '<wp:extent cx="2200000" cy="620000"/>'
+        . '<wp:extent cx="2500000" cy="700000"/>'
         . '<wp:docPr id="1" name="ZAME Logo"/>'
         . '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
         . '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
         . '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
-        . '<pic:nvPicPr><pic:cNvPr id="0" name="Logo_zame_1.png"/><pic:cNvPicPr/></pic:nvPicPr>'
+        . '<pic:nvPicPr><pic:cNvPr id="0" name="Logo_zame_2.png"/><pic:cNvPicPr/></pic:nvPicPr>'
         . '<pic:blipFill><a:blip r:embed="' . escape_docx($relationshipId) . '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'
-        . '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="2200000" cy="620000"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>'
+        . '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="2500000" cy="700000"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>'
         . '</pic:pic></a:graphicData></a:graphic>'
         . '</wp:inline></w:drawing></w:r></w:p>';
 }
@@ -207,9 +216,6 @@ function build_quote_item_description(array $item)
         $lines[] = 'Incluye control: ' . $item['control_name'] . '.';
     }
 
-    $lines[] = 'Medidas de referencia: ' . format_money($item['width']) . ' m × ' . format_money($item['height']) . ' m.';
-    $lines[] = 'Área cobrable estimada: ' . format_money($item['area']) . ' m².';
-
     return $lines;
 }
 
@@ -218,44 +224,63 @@ function build_quote_docx_xml(array $document)
     $meta = $document['meta'];
     $items = $document['items'];
     $company = $document['company'];
-    $headerLeft = !empty($document['logo_relationship_id'])
+    $headerLeft = (!empty($document['logo_relationship_id'])
         ? make_docx_inline_image($document['logo_relationship_id'])
-        : make_docx_paragraph($company['name'], ['bold' => true, 'size' => 28]);
+        : make_docx_paragraph($company['name'], ['bold' => true, 'size' => 28, 'spacing_after' => 80]))
+        . make_docx_paragraph('Datos del asesor', ['bold' => true, 'color' => '486581', 'spacing_after' => 40])
+        . make_docx_paragraph($company['name'], ['bold' => true, 'size' => 22, 'spacing_after' => 10])
+        . make_docx_paragraph($company['tagline'], ['color' => '486581', 'spacing_after' => 40])
+        . make_docx_paragraph('Correo: zame.motorizacion@gmail.com / ' . $company['email'], ['spacing_after' => 20])
+        . make_docx_paragraph('Sitio: ' . $company['website'], ['spacing_after' => 20])
+        . make_docx_paragraph('Asesor: Elizabeth Orozco', ['spacing_after' => 20])
+        . make_docx_paragraph('WhatsApp Oficina: 477-173-8901');
 
     $headerRight = implode('', [
-        make_docx_paragraph('Folio: ' . $document['folio'], ['bold' => true, 'size' => 24, 'spacing_after' => 30]),
-        make_docx_paragraph('Fecha: ' . $document['date'], ['spacing_after' => 20]),
-        make_docx_paragraph('Atención: ' . $meta['client_name'], ['spacing_after' => 20]),
-        make_docx_paragraph('Tel/WhatsApp: ' . $meta['client_phone'], ['spacing_after' => 20]),
-        make_docx_paragraph('Email: ' . $company['email'], ['spacing_after' => 20]),
-        make_docx_paragraph('Domicilio: ' . $company['address']),
+        make_docx_paragraph('Datos de la cotización', ['bold' => true, 'color' => '486581', 'align' => 'right', 'spacing_after' => 40]),
+        make_docx_paragraph('Folio: ' . $document['folio'], ['bold' => true, 'size' => 24, 'align' => 'right', 'spacing_after' => 30]),
+        make_docx_paragraph('Fecha: ' . $document['date'], ['align' => 'right', 'spacing_after' => 20]),
+        make_docx_paragraph('Vigencia: ' . $meta['validity'], ['align' => 'right']),
     ]);
 
     $headerTable = make_docx_table([
         make_docx_table_row([
-            ['content' => $headerLeft, 'options' => ['width' => 3200, 'valign' => 'center']],
-            ['content' => $headerRight, 'options' => ['width' => 5800]],
+            ['content' => $headerLeft, 'options' => ['width' => 5800, 'valign' => 'top']],
+            ['content' => $headerRight, 'options' => ['width' => 3200, 'valign' => 'top']],
+        ]),
+    ], ['width' => 9000, 'borders' => false, 'cell_margin' => 40]);
+
+    $clientAddress = $meta['client_address'] !== '' ? $meta['client_address'] : 'Pendiente por compartir.';
+    $clientTable = make_docx_table([
+        make_docx_table_row([
+            ['content' => make_docx_paragraph('Datos del cliente', ['bold' => true, 'color' => 'FFFFFF', 'spacing_after' => 0]), 'options' => ['width' => 9000, 'background' => '334E68', 'grid_span' => 2]],
+        ]),
+        make_docx_table_row([
+            ['content' => make_docx_paragraph('Atención / Cliente: ' . $meta['client_name'], ['spacing_after' => 0]), 'options' => ['width' => 4500]],
+            ['content' => make_docx_paragraph('Teléfono / WhatsApp: ' . $meta['client_phone'], ['spacing_after' => 0]), 'options' => ['width' => 4500]],
+        ]),
+        make_docx_table_row([
+            ['content' => make_docx_paragraph('Dirección: ' . $clientAddress, ['spacing_after' => 0]), 'options' => ['width' => 9000, 'grid_span' => 2]],
         ]),
     ], ['width' => 9000]);
 
     $quoteRows = [];
     $quoteRows[] = make_docx_table_row([
-        ['content' => make_docx_paragraph('Cant.', ['bold' => true, 'color' => 'FFFFFF', 'align' => 'center']), 'options' => ['width' => 900]],
+        ['content' => make_docx_paragraph('Cantidad', ['bold' => true, 'color' => 'FFFFFF', 'align' => 'center']), 'options' => ['width' => 1200]],
         ['content' => make_docx_paragraph('Descripción', ['bold' => true, 'color' => 'FFFFFF']), 'options' => ['width' => 5900]],
         ['content' => make_docx_paragraph('Precio', ['bold' => true, 'color' => 'FFFFFF', 'align' => 'center']), 'options' => ['width' => 2200]],
     ], ['header' => true]);
 
     foreach ($items as $item) {
         $quoteRows[] = make_docx_table_row([
-            ['content' => make_docx_paragraph('1', ['align' => 'center', 'spacing_after' => 0]), 'options' => ['width' => 900, 'valign' => 'center']],
-            ['content' => make_docx_multiline_paragraph(build_quote_item_description($item), ['spacing_after' => 0]), 'options' => ['width' => 5900]],
+            ['content' => make_docx_paragraph('1', ['align' => 'center', 'spacing_after' => 0]), 'options' => ['width' => 1200, 'valign' => 'center']],
+            ['content' => make_docx_multiline_paragraph(build_quote_item_description($item), ['spacing_after' => 0]), 'options' => ['width' => 5600]],
             ['content' => make_docx_paragraph('$' . format_money($item['total_price']), ['align' => 'center', 'bold' => true]), 'options' => ['width' => 2200, 'valign' => 'center']],
         ]);
     }
 
     $quoteRows[] = make_docx_table_row([
-        ['content' => make_docx_paragraph('', ['spacing_after' => 0]), 'options' => ['width' => 900, 'background' => 'F9FAFB']],
-        ['content' => make_docx_paragraph('TOTAL', ['bold' => true, 'align' => 'right']), 'options' => ['width' => 5900, 'background' => 'F9FAFB']],
+        ['content' => make_docx_paragraph('', ['spacing_after' => 0]), 'options' => ['width' => 1200, 'background' => 'F9FAFB']],
+        ['content' => make_docx_paragraph('TOTAL', ['bold' => true, 'align' => 'right']), 'options' => ['width' => 5600, 'background' => 'F9FAFB']],
         ['content' => make_docx_paragraph('$' . format_money($document['total']), ['bold' => true, 'align' => 'center']), 'options' => ['width' => 2200, 'background' => 'F9FAFB']],
     ]);
 
@@ -304,8 +329,10 @@ function build_quote_docx_xml(array $document)
         . 'mc:Ignorable="w14 wp14">'
         . '<w:body>'
         . $headerTable
-        . make_docx_paragraph('', ['spacing_after' => 90])
-        . make_docx_multiline_paragraph($company['intro_text'], ['spacing_after' => 200])
+        . make_docx_paragraph('', ['spacing_after' => 80])
+        . $clientTable
+        . make_docx_paragraph('', ['spacing_after' => 100])
+        . make_docx_paragraph($company['intro_text'][0] ?? 'Encontrará a continuación el presupuesto solicitado. Quedamos a sus órdenes para cualquier aclaración.', ['spacing_after' => 200])
         . $quoteTable
         . make_docx_paragraph('', ['spacing_after' => 140])
         . $conditionsTable
@@ -388,8 +415,8 @@ function build_quote_docx_file(array $document, $outputFile)
 
     $documentRelationships = [];
     if ($logoRelationshipId !== null) {
-        $documentRelationships[] = '<Relationship Id="' . $logoRelationshipId . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/Logo_zame_1.png"/>';
-        $zip->addFile($document['company']['logo_path'], 'word/media/Logo_zame_1.png');
+        $documentRelationships[] = '<Relationship Id="' . $logoRelationshipId . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/Logo_zame_2.png"/>';
+        $zip->addFile($document['company']['logo_path'], 'word/media/Logo_zame_2.png');
     }
 
     $zip->addFromString('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'

@@ -31,6 +31,7 @@ function get_quote_meta()
     return $_SESSION['quote_meta'] ?? [
         'cliente' => '',
         'telefono' => '',
+        'direccion' => '',
         'vigencia' => '7 días naturales',
         'observaciones' => '',
     ];
@@ -41,6 +42,7 @@ function save_quote_meta(array $meta)
     $_SESSION['quote_meta'] = [
         'cliente' => trim((string) ($meta['cliente'] ?? '')),
         'telefono' => trim((string) ($meta['telefono'] ?? '')),
+        'direccion' => trim((string) ($meta['direccion'] ?? '')),
         'vigencia' => trim((string) ($meta['vigencia'] ?? '7 días naturales')),
         'observaciones' => trim((string) ($meta['observaciones'] ?? '')),
     ];

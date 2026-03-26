@@ -13,6 +13,7 @@ $storedMeta = get_quote_meta();
 $formData = [
     'cliente' => $storedMeta['cliente'],
     'telefono' => $storedMeta['telefono'],
+    'direccion' => $storedMeta['direccion'] ?? '',
     'vigencia' => $storedMeta['vigencia'],
     'observaciones' => $storedMeta['observaciones'],
     'tipo' => '',
@@ -35,6 +36,7 @@ $action = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData['cliente'] = trim($_POST['cliente'] ?? $formData['cliente']);
     $formData['telefono'] = trim($_POST['telefono'] ?? $formData['telefono']);
+    $formData['direccion'] = trim($_POST['direccion'] ?? $formData['direccion']);
     $formData['vigencia'] = trim($_POST['vigencia'] ?? $formData['vigencia']);
     $formData['observaciones'] = trim($_POST['observaciones'] ?? $formData['observaciones']);
     $formData['tipo'] = trim($_POST['tipo'] ?? '');
@@ -49,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     save_quote_meta([
         'cliente' => $formData['cliente'],
         'telefono' => $formData['telefono'],
+        'direccion' => $formData['direccion'],
         'vigencia' => $formData['vigencia'],
         'observaciones' => $formData['observaciones'],
     ]);
@@ -170,6 +173,10 @@ render_header('Cotizador de persianas - Fase 3');
                 <div>
                     <label for="telefono">Teléfono o WhatsApp</label>
                     <input id="telefono" name="telefono" type="text" value="<?php echo htmlspecialchars($formData['telefono'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                </div>
+                <div>
+                    <label for="direccion">Dirección</label>
+                    <input id="direccion" name="direccion" type="text" value="<?php echo htmlspecialchars($formData['direccion'], ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
                 <div>
                     <label for="vigencia">Vigencia</label>
